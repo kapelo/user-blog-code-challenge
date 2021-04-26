@@ -15,15 +15,32 @@ import java.util.List;
 public class ValidateEmailTests {
     private int userId;
     private String emailRegex = "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*$";
+    List<Post> userPosts;
 
     @DataProvider
-    public static Object[][] usernames() {
+    public static Object[][] invalidUsername() {
         return new Object[][] {
-                { "Delphine"}
+                { "fakeusername1" },
+                { "fakeusername2" }
         };
     }
 
-    @Test(dataProvider = "usernames")
+    @Test(dataProvider = "invalidUsername")
+    public void verifyInvalidUsernameReturnsAnEmptyArray(String username) {
+        List<User> users = Arrays.asList(Users.getUser(username).as(User[].class));
+        int size = users.size();
+
+        Assert.assertEquals(size, 0);
+    }
+
+    @DataProvider
+    public static Object[][] validUsername() {
+        return new Object[][] {
+                { "Delphine" }
+        };
+    }
+
+    @Test(dataProvider = "validUsername")
     public void verifyUsersUsername(String username) {
         List<User> users = Arrays.asList(Users.getUser(username).as(User[].class));
         User user = users.get(0);
@@ -32,7 +49,7 @@ public class ValidateEmailTests {
         Assert.assertEquals(user.getUsername(), username);
     }
 
-    @Test(dataProvider = "usernames")
+    @Test(dataProvider = "validUsername")
     public void verifyAllUsersHaveUsername(String username) {
         Users.getAllUsers()
                 .then()
@@ -40,8 +57,8 @@ public class ValidateEmailTests {
                 .body(Matchers.containsStringIgnoringCase(username));
     }
 
-    @Test(dataProvider = "usernames")
-    public void verifyThereAreMoreThanZeroUsers(String username) {
+    @Test
+    public void verifyThereAreMoreThanZeroUsers() {
         List<User> users = Arrays.asList(Users.getAllUsers().as(User[].class));
         int size = users.size();
 
@@ -49,12 +66,30 @@ public class ValidateEmailTests {
     }
 
     @Test(dependsOnMethods = "verifyUsersUsername")
-    public void verifyEmailFormatInPostComments() {
+    public void verifyPostsByUser() {
         SoftAssert softAssert = new SoftAssert();
-        List<Post> userPosts = Arrays.asList(Posts.getUserPostsById(userId).as(Post[].class));
+        userPosts = Arrays.asList(Posts.getUserPostsById(userId).as(Post[].class));
 
         userPosts.forEach(userPost -> {
-            Assert.assertEquals(userPost.getUserId(), userId);
+            softAssert.assertEquals(userPost.getUserId(), userId);
+        });
+
+        softAssert.assertAll();
+    }
+
+    @Test
+    public void verifySearchingForPostsByInvalidUserIdReturnsAnEmptyArray() {
+        userPosts = Arrays.asList(Posts.getUserPostsById(10000001).as(Post[].class));
+        int size = userPosts.size();
+
+        Assert.assertEquals(size, 0);
+    }
+
+    @Test(dependsOnMethods = { "verifyUsersUsername", "verifyPostsByUser" })
+    public void verifyEmailFormatInPostComments() {
+        SoftAssert softAssert = new SoftAssert();
+
+        userPosts.forEach(userPost -> {
             List<Comment> commentsOnUserPost = Arrays.asList(Comments.getCommentsByPostId(userPost.getId()).as(Comment[].class));
 
             commentsOnUserPost.forEach(comment -> {
@@ -63,5 +98,14 @@ public class ValidateEmailTests {
         });
 
         softAssert.assertAll();
+    }
+
+    @Test
+    public void verifySearchingForCommentsByInvalidPostIdReturnsAnEmptyArray() {
+        List<Comment> commentsOnUserPost = Arrays.asList(Comments.getCommentsByPostId(10000001).as(Comment[].class));
+
+        int size = commentsOnUserPost.size();
+
+        Assert.assertEquals(size, 0);
     }
 }
