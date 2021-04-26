@@ -1,0 +1,24 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="jsonplaceholder-typicode-post-tests" verbose="1">
+    <!-- <listeners>
+        <listener class-name="common.MyTestListener"/>
+    </listeners> -->
+    <test name="post-tests">
+        <parameter name="userName" value="Samantha"/>
+        <parameter name="invalidUserName" value="ThisIsSomeInvalidNameThatCanNeverBeARealName"/>
+        <parameter name="invalidUserId" value="123456"/>
+        <parameter name="invalidPostId" value="123456"/>
+        <parameter name="postTitle" value="Post title"/>
+        <parameter name="postBody" value="This is a sample post body"/>
+        <parameter name="updatedPostTitle" value="Updated post title"/>
+        <parameter name="fakePostId" value="1"/>
+        <classes>
+            <class name="ValidateEmailTests">
+                <methods>
+                    <include name="getUserByUsername"/>
+                    <include name="getPostsByUserId"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
+</suite>
