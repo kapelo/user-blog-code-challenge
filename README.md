@@ -9,4 +9,6 @@ API tests for validating comments on a post
 - Rest Assured
 
 ## How to run tests
-`mvn test`
+- Rename `empty_config.properties` to `config.properties`
+- Add `url` to `config.properties
+- Run tests in terminal using `mvn test`

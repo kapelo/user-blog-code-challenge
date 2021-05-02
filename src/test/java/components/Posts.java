@@ -1,29 +1,15 @@
 package components;
 
-import io.restassured.response.Response;
-import io.restassured.specification.RequestSpecification;
-import io.restassured.specification.ResponseSpecification;
-import util.InitializeSpecification;
-
-import static io.restassured.RestAssured.given;
+import entities.Post;
+import util.RequestHandler;
+import java.util.Arrays;
+import java.util.List;
 
 public class Posts {
-    private static RequestSpecification requestSpecification;
-    private static ResponseSpecification responseSpecification;
+    private static final String PATH = "posts";
+    private static final String PARAMETER_NAME = "userId"; //Convert to enum
 
-    public static Response getUserPostsById(int userId) {
-        requestSpecification = InitializeSpecification.createRequestSpecification();
-        responseSpecification = InitializeSpecification.createResponseSpecification();
-
-        Response userPostsResponse = given()
-                .spec(requestSpecification)
-                .param("userId", userId)
-                .get("posts");
-
-        userPostsResponse.then()
-                .assertThat()
-                .spec(responseSpecification);
-
-        return userPostsResponse;
+    public static List<Post> getPostsByUserId(int userId) {
+        return Arrays.asList(RequestHandler.sendValidGetRequest(PATH, PARAMETER_NAME, userId).as(Post[].class));
     }
 }
