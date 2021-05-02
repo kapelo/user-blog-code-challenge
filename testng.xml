@@ -1,8 +1,11 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
 <suite name="User Posts API Test Suite" verbose="1">
+    <listeners>
+        <listener class-name="util.TestListener"/>
+    </listeners>
     <test name="APITests">
         <classes>
-            <class name="ValidateEmailTests"/>
+            <class name="EmailFormatTests"/>
         </classes>
     </test>
 </suite>

@@ -1,44 +1,23 @@
 package components;
 
-import io.restassured.response.Response;
-import io.restassured.specification.RequestSpecification;
-import io.restassured.specification.ResponseSpecification;
-import util.InitializeSpecification;
-
-import static io.restassured.RestAssured.given;
+import entities.User;
+import util.RequestHandler;
+import java.util.Arrays;
+import java.util.List;
 
 public class Users {
-    private static RequestSpecification requestSpecification;
-    private static ResponseSpecification responseSpecification;
+    private static final String PATH = "users";
+    private static final String PARAMETER_NAME = "username"; //Convert to enum
 
-    public static Response getUser(String username) {
-        requestSpecification = InitializeSpecification.createRequestSpecification();
-        responseSpecification = InitializeSpecification.createResponseSpecification();
-
-        Response userResponse = given()
-                .spec(requestSpecification)
-                .param("username", username)
-                .get("users");
-
-        userResponse.then()
-                .assertThat()
-                .spec(responseSpecification);
-
-        return userResponse;
+    public static List<User> getUserDetailsByUsername(String username) {
+        return Arrays.asList(
+                RequestHandler.sendValidGetRequest(PATH, PARAMETER_NAME, username).as(User[].class)
+        );
     }
 
-    public static Response getAllUsers() {
-        requestSpecification = InitializeSpecification.createRequestSpecification();
-        responseSpecification = InitializeSpecification.createResponseSpecification();
-
-        Response allUsersResponse = given()
-                .spec(requestSpecification)
-                .get("users");
-
-        allUsersResponse.then()
-                .assertThat()
-                .spec(responseSpecification);
-
-        return allUsersResponse;
+    public static List<User> getAllUsers() {
+        return Arrays.asList(
+                RequestHandler.sendValidGetRequest(PATH).as(User[].class)
+        );
     }
 }

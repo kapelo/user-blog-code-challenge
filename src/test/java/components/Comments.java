@@ -1,29 +1,15 @@
 package components;
 
-import io.restassured.response.Response;
-import io.restassured.specification.RequestSpecification;
-import io.restassured.specification.ResponseSpecification;
-import util.InitializeSpecification;
-
-import static io.restassured.RestAssured.given;
+import entities.Comment;
+import util.RequestHandler;
+import java.util.Arrays;
+import java.util.List;
 
 public class Comments {
-    private static RequestSpecification requestSpecification;
-    private static ResponseSpecification responseSpecification;
+    private static final String PATH = "comments";
+    private static final String PARAMETER_NAME = "postId"; //Convert to enum
 
-    public static Response getCommentsByPostId(int postId) {
-        requestSpecification = InitializeSpecification.createRequestSpecification();
-        responseSpecification = InitializeSpecification.createResponseSpecification();
-
-        Response commentsOnUserPostResponse = given()
-                .spec(requestSpecification)
-                .param("postId", postId)
-                .get("comments");
-
-        commentsOnUserPostResponse.then()
-                .assertThat()
-                .spec(responseSpecification);
-
-        return commentsOnUserPostResponse;
+    public static List<Comment> getCommentsByPostId(int postId) {
+        return Arrays.asList(RequestHandler.sendValidGetRequest(PATH, PARAMETER_NAME, postId).as(Comment[].class));
     }
 }
